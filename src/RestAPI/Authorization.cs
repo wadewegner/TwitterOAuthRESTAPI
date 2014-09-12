@@ -46,7 +46,7 @@ namespace TwitterOAuth.RestAPI
 
             var parameterString = string.Join("&",
                                     from k in signingParameters.Keys
-                                    select Uri.EscapeDataString((k)) + "=" +
+                                    select Uri.EscapeDataString(k) + "=" +
                                            Uri.EscapeDataString(signingParameters[k]));
 
             var stringToSign = string.Join("&", new[] {"GET", baseUrl, parameterString}.Select(Uri.EscapeDataString));
@@ -57,7 +57,7 @@ namespace TwitterOAuth.RestAPI
 
             var authHeader = string.Join(", ", from k in oauthParameters.Keys
                                                select string.Format(@"{0}=""{1}""",
-                                                   Uri.EscapeDataString((k)),
+                                                   Uri.EscapeDataString(k),
                                                    Uri.EscapeDataString(oauthParameters[k])));
 
             return authHeader;
