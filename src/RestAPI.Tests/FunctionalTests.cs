@@ -1,6 +1,6 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using TwitterOAuth.RestAPI;
 using TwitterOAuth.RestAPI.Models;
+using TwitterOAuth.RestAPI.Models.Twitter;
 using TwitterOAuth.RestAPI.Resources;
 
 namespace RestAPI.Tests
@@ -46,18 +47,29 @@ namespace RestAPI.Tests
             var authHeader = _authorization.GetHeader(uri);
             Assert.IsNotNull(authHeader);
 
-            await HttpSend(authHeader, uri);
+            await HttpSend<SearchTweetsModel>(authHeader, uri);
+        }
+
+        [Test]
+        public async Task FriendsIds()
+        {
+            var uri = new Uri(string.Format("{0}?{1}", Urls.FriendsIds, "screen_name=wadewegner"));
+
+            var authHeader = _authorization.GetHeader(uri);
+            Assert.IsNotNull(authHeader);
+
+            await HttpSend<FriendsIdsModel>(authHeader, uri);
         }
 
         [Test]
         public async Task UsersLookup()
         {
-            var uri = new Uri(string.Format("{0}?{1}", Urls.UsersLookup, "screen_name=wadewegner"));
+            var uri = new Uri(string.Format("{0}?{1}", Urls.UsersLookup, "screen_name=wadewegner,smarx"));
 
             var authHeader = _authorization.GetHeader(uri);
             Assert.IsNotNull(authHeader);
 
-            await HttpSend(authHeader, uri);
+            await HttpSend<List<UserLookupModel>>(authHeader, uri);
         }
 
         [Test]
@@ -69,10 +81,10 @@ namespace RestAPI.Tests
             var authHeader = _authorization.GetHeader(uri, HttpMethod.Post);
             Assert.IsNotNull(authHeader);
 
-            await HttpSend(authHeader, uri, HttpMethod.Post);
+            await HttpSend<StatusesUpdateModel>(authHeader, uri, HttpMethod.Post);
         }
 
-        private static async Task HttpSend(string authHeader, Uri uri, HttpMethod httpMethod = null)
+        private static async Task HttpSend<T>(string authHeader, Uri uri, HttpMethod httpMethod = null)
         {
             if (httpMethod == null)
                 httpMethod = HttpMethod.Get;
@@ -97,18 +109,16 @@ namespace RestAPI.Tests
             {
                 var jArray = JArray.Parse(response);
 
-                var responseObject = JsonConvert.DeserializeObject<dynamic>(jArray.ToString());
+                var responseObject = JsonConvert.DeserializeObject<T>(jArray.ToString());
                 Assert.IsNotNull(responseObject);
             }
             else
             {
                 var jObject = JObject.Parse(response);
 
-                var responseObject = JsonConvert.DeserializeObject<dynamic>(jObject.ToString());
+                var responseObject = JsonConvert.DeserializeObject<T>(jObject.ToString());
                 Assert.IsNotNull(responseObject);
             }
-
-            
         }
     }
 }

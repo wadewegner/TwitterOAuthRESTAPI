@@ -43,6 +43,20 @@
   <ItemGroup>
     <Compile Include="Authorization.cs" />
     <Compile Include="Models\SecretModel.cs" />
+    <Compile Include="Models\StatusesUpdateModel.cs" />
+    <Compile Include="Models\Twitter\Description.cs" />
+    <Compile Include="Models\Twitter\Entities.cs" />
+    <Compile Include="Models\FriendsIdsModel.cs" />
+    <Compile Include="Models\Twitter\Hashtag.cs" />
+    <Compile Include="Models\Twitter\Metadata.cs" />
+    <Compile Include="Models\SearchTweetsModel.cs" />
+    <Compile Include="Models\Twitter\SearchMetadata.cs" />
+    <Compile Include="Models\Twitter\Status.cs" />
+    <Compile Include="Models\Twitter\Url.cs" />
+    <Compile Include="Models\Twitter\UrlData.cs" />
+    <Compile Include="Models\Twitter\User.cs" />
+    <Compile Include="Models\UserLookupModel.cs" />
+    <Compile Include="Models\Twitter\UserMention.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Urls.cs" />
   </ItemGroup>
