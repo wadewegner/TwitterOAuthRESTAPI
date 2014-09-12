@@ -15,10 +15,14 @@ namespace RestAPI.Tests
     [TestFixture]
     public class FunctionalTests
     {
-        [Test]
-        public async Task CreateAuthHeaderAndTestWithHttpRequest()
+        private SecretModel _secretModel;
+        private Authorization _authorization;
+        private static HttpClient _httpClient;
+
+        [TestFixtureSetUp]
+        public void Init()
         {
-            var secret = new Secret
+            _secretModel = new SecretModel
             {
                 ApiKey = "",
                 ApiSecret = "",
@@ -26,36 +30,85 @@ namespace RestAPI.Tests
                 AccessTokenSecret = ""
             };
 
-            var authorization = new Authorization(secret);
+            _authorization = new Authorization(_secretModel);
+            _httpClient = new HttpClient();
+        }
 
-            const string query = "q=wadewegner";
-            var uri = new Uri(string.Format("{0}?{1}", Urls.SearchUrl, query));
+        [TestFixtureTearDown]
+        public void Cleanup()
+        { /* ... */ }
 
-            var authHeader = authorization.GetHeader(uri);
+        [Test]
+        public async Task SearchTweets()
+        {
+            var uri = new Uri(string.Format("{0}?{1}", Urls.SearchTweets, "q=wadewegner"));
 
+            var authHeader = _authorization.GetHeader(uri);
             Assert.IsNotNull(authHeader);
 
-            using (var httpClient = new HttpClient())
+            await HttpSend(authHeader, uri);
+        }
+
+        [Test]
+        public async Task UsersLookup()
+        {
+            var uri = new Uri(string.Format("{0}?{1}", Urls.UsersLookup, "screen_name=wadewegner"));
+
+            var authHeader = _authorization.GetHeader(uri);
+            Assert.IsNotNull(authHeader);
+
+            await HttpSend(authHeader, uri);
+        }
+
+        [Test]
+        public async Task StatusesUpdate()
+        {
+            const string query = "status=Test&display_coordinates=false";
+            var uri = new Uri(string.Format("{0}?{1}", Urls.StatusesUpdate, query));
+
+            var authHeader = _authorization.GetHeader(uri, HttpMethod.Post);
+            Assert.IsNotNull(authHeader);
+
+            await HttpSend(authHeader, uri, HttpMethod.Post);
+        }
+
+        private static async Task HttpSend(string authHeader, Uri uri, HttpMethod httpMethod = null)
+        {
+            if (httpMethod == null)
+                httpMethod = HttpMethod.Get;
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", authHeader);
+
+            var request = new HttpRequestMessage
             {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", authHeader);
+                RequestUri = uri,
+                Method = httpMethod
+            };
 
-                var request = new HttpRequestMessage
-                {
-                    RequestUri = uri,
-                    Method = HttpMethod.Get
-                };
+            var responseMessage = await _httpClient.SendAsync(request).ConfigureAwait(false);
 
-                var responseMessage = await httpClient.SendAsync(request).ConfigureAwait(false);
+            Assert.IsNotNull(responseMessage);
+            Assert.IsTrue(responseMessage.IsSuccessStatusCode, responseMessage.ToString());
 
-                Assert.IsNotNull(responseMessage);
-                Assert.IsTrue(responseMessage.IsSuccessStatusCode);
+            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+            
+            var jToken = JToken.Parse(response);
+            if (jToken.Type == JTokenType.Array)
+            {
+                var jArray = JArray.Parse(response);
 
-                var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
-                var jObject = JObject.Parse(response);
-                var responseObject = JsonConvert.DeserializeObject<dynamic>(jObject.ToString());
-
+                var responseObject = JsonConvert.DeserializeObject<dynamic>(jArray.ToString());
                 Assert.IsNotNull(responseObject);
             }
+            else
+            {
+                var jObject = JObject.Parse(response);
+
+                var responseObject = JsonConvert.DeserializeObject<dynamic>(jObject.ToString());
+                Assert.IsNotNull(responseObject);
+            }
+
+            
         }
     }
 }

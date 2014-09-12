@@ -1,6 +1,6 @@
 ﻿namespace TwitterOAuth.RestAPI.Models
 {
-    public class Secret
+    public class SecretModel
     {
         public string ApiKey { get; set; }
         public string ApiSecret { get; set; }

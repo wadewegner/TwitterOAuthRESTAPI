@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
@@ -11,15 +12,18 @@ namespace TwitterOAuth.RestAPI
 {
     public class Authorization
     {
-        public Secret Secret { get; private set; }
+        public SecretModel Secret { get; private set; }
 
-        public Authorization(Secret secret)
+        public Authorization(SecretModel secret)
         {
             Secret = secret;
         }
 
-        public string GetHeader(Uri uri)
+        public string GetHeader(Uri uri, HttpMethod httpMethod = null)
         {
+            if (httpMethod == null)
+                httpMethod = HttpMethod.Get;
+
             var nonce = Guid.NewGuid().ToString();
             var timestamp = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds).ToString(CultureInfo.InvariantCulture);
 
@@ -35,10 +39,10 @@ namespace TwitterOAuth.RestAPI
 
             var signingParameters = new SortedDictionary<string, string>(oauthParameters);
 
-            var query = HttpUtility.ParseQueryString(uri.Query);
-            foreach (var k in query.AllKeys)
+            var parsedQuery = HttpUtility.ParseQueryString(uri.Query);
+            foreach (var k in parsedQuery.AllKeys)
             {
-                signingParameters.Add(k, query[k]);
+                signingParameters.Add(k, parsedQuery[k]);
             }
 
             var builder = new UriBuilder(uri) { Query = "" };
@@ -49,7 +53,7 @@ namespace TwitterOAuth.RestAPI
                                     select Uri.EscapeDataString(k) + "=" +
                                            Uri.EscapeDataString(signingParameters[k]));
 
-            var stringToSign = string.Join("&", new[] {"GET", baseUrl, parameterString}.Select(Uri.EscapeDataString));
+            var stringToSign = string.Join("&", new[] { httpMethod.Method.ToUpper(), baseUrl, parameterString }.Select(Uri.EscapeDataString));
             var signingKey = Secret.ApiSecret + "&" + Secret.AccessTokenSecret;
             var signature = Convert.ToBase64String(new HMACSHA1(Encoding.ASCII.GetBytes(signingKey)).ComputeHash(Encoding.ASCII.GetBytes(stringToSign)));
 
