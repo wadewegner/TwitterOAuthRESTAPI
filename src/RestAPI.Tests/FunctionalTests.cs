@@ -27,8 +27,8 @@ namespace RestAPI.Tests
 
             var authorization = new Authorization(secret);
 
-            const string query = "@wadewegner AND #homebrew";
-            var url = string.Format("{0}?q={1}", Urls.SearchUrl, Uri.EscapeDataString(query));
+            const string query = "q=@wadewegner AND #homebrew";
+            var url = string.Format("{0}?{1}", Urls.SearchUrl, Uri.EscapeDataString(query));
 
             var authHeader = authorization.GetHeader(Urls.SearchUrl, query);
 
