@@ -1,5 +1,7 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,7 @@ namespace RestAPI.Tests
     public class FunctionalTests
     {
         [Test]
-        public async Task Test()
+        public async Task CreateAuthHeaderAndTestWithHttpRequest()
         {
             var secret = new Secret
             {
@@ -27,8 +29,8 @@ namespace RestAPI.Tests
 
             var authorization = new Authorization(secret);
 
-            const string query = "q=wadewegner";
-            var url = string.Format("{0}?{1}", Resources.SearchUrl, query);
+            const string query = "wadewegner AND vs";
+            var url = string.Format("{0}?q={1}", Resources.SearchUrl, query);
 
             var authHeader = authorization.GetHeader(Resources.SearchUrl, query);
 
@@ -41,13 +43,19 @@ namespace RestAPI.Tests
                 var request = new HttpRequestMessage
                 {
                     RequestUri = new Uri(url),
-                    Method = HttpMethod.Get //TODO: dymanic
+                    Method = HttpMethod.Get
                 };
 
                 var responseMessage = await httpClient.SendAsync(request).ConfigureAwait(false);
 
                 Assert.IsNotNull(responseMessage);
                 Assert.IsTrue(responseMessage.IsSuccessStatusCode);
+
+                var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var jObject = JObject.Parse(response);
+                var responseObject = JsonConvert.DeserializeObject<dynamic>(jObject.ToString());
+
+                Assert.IsNotNull(responseObject);
             }
         }
     }
