@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -27,10 +28,10 @@ namespace RestAPI.Tests
 
             var authorization = new Authorization(secret);
 
-            const string query = "q=@wadewegner AND #homebrew";
-            var url = string.Format("{0}?{1}", Urls.SearchUrl, Uri.EscapeDataString(query));
+            const string query = "q=wadewegner";
+            var uri = new Uri(string.Format("{0}?{1}", Urls.SearchUrl, query));
 
-            var authHeader = authorization.GetHeader(Urls.SearchUrl, query);
+            var authHeader = authorization.GetHeader(uri);
 
             Assert.IsNotNull(authHeader);
 
@@ -40,7 +41,7 @@ namespace RestAPI.Tests
 
                 var request = new HttpRequestMessage
                 {
-                    RequestUri = new Uri(url),
+                    RequestUri = uri,
                     Method = HttpMethod.Get
                 };
 
