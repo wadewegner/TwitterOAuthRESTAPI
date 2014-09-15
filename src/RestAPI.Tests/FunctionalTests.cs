@@ -97,7 +97,7 @@ namespace RestAPI.Tests
             var authHeader = _authorization.GetHeader(uri);
             Assert.IsNotNull(authHeader);
 
-            await HttpSend<List<dynamic>>(authHeader, uri);
+            await HttpSend<List<StatusesMentionsTimelineModel>>(authHeader, uri);
         }
 
         private static async Task HttpSend<T>(string authHeader, Uri uri, HttpMethod httpMethod = null)
