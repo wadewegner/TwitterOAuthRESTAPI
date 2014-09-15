@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authorization.cs" />
+    <Compile Include="Models\FollowersIdsModel.cs" />
     <Compile Include="Models\SecretModel.cs" />
     <Compile Include="Models\StatusesUpdateModel.cs" />
     <Compile Include="Models\Twitter\Description.cs" />

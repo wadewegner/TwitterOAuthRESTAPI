@@ -67,6 +67,17 @@ namespace RestAPI.Tests
         }
 
         [Test]
+        public async Task FollowersIds()
+        {
+            var uri = new Uri(string.Format("{0}?{1}", Urls.FollowersIds, "screen_name=wadewegner"));
+
+            var authHeader = _authorization.GetHeader(uri);
+            Assert.IsNotNull(authHeader);
+
+            await HttpSend<FollowersIdsModel>(authHeader, uri);
+        }
+
+        [Test]
         public async Task UsersLookup()
         {
             var uri = new Uri(string.Format("{0}?{1}", Urls.UsersLookup, "screen_name=wadewegner,smarx"));
