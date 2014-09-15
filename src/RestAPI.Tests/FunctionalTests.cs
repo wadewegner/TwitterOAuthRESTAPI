@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -8,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using TwitterOAuth.RestAPI;
 using TwitterOAuth.RestAPI.Models;
-using TwitterOAuth.RestAPI.Models.Twitter;
 using TwitterOAuth.RestAPI.Resources;
 
 namespace RestAPI.Tests
@@ -20,15 +20,20 @@ namespace RestAPI.Tests
         private Authorization _authorization;
         private static HttpClient _httpClient;
 
+        private readonly string _apiKey = ConfigurationManager.AppSettings["ApiKey"];
+        private readonly string _apiSecret = ConfigurationManager.AppSettings["ApiSecret"];
+        private readonly string _accessToken = ConfigurationManager.AppSettings["AccessToken"];
+        private readonly string _accessTokenSecret = ConfigurationManager.AppSettings["AccessTokenSecret"];
+
         [TestFixtureSetUp]
         public void Init()
         {
             _secretModel = new SecretModel
             {
-                ApiKey = "",
-                ApiSecret = "",
-                AccessToken = "",
-                AccessTokenSecret = ""
+                ApiKey = _apiKey,
+                ApiSecret = _apiSecret,
+                AccessToken = _accessToken,
+                AccessTokenSecret = _accessTokenSecret
             };
 
             _authorization = new Authorization(_secretModel);
@@ -82,6 +87,17 @@ namespace RestAPI.Tests
             Assert.IsNotNull(authHeader);
 
             await HttpSend<StatusesUpdateModel>(authHeader, uri, HttpMethod.Post);
+        }
+
+        [Test]
+        public async Task StatusesMentionsTimeline()
+        {
+            var uri = new Uri(string.Format("{0}?{1}", Urls.StatusesMentionsTimeline, ""));
+
+            var authHeader = _authorization.GetHeader(uri);
+            Assert.IsNotNull(authHeader);
+
+            await HttpSend<List<dynamic>>(authHeader, uri);
         }
 
         private static async Task HttpSend<T>(string authHeader, Uri uri, HttpMethod httpMethod = null)
