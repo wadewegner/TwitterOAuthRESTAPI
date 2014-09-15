@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>WadeWegner.Twitter.RestApi</id>
+    <version>0.0.1</version>
+    <title>Simple Twitter REST API</title>
+    <authors>wadewegner</authors>
+    <owners>wadewegner</owners>
+    <licenseUrl>https://raw.githubusercontent.com/wadewegner/TwitterOAuthRESTAPI/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/wadewegner/TwitterOAuthRESTAPI</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A set of simple and useful libraries for using the Twitter REST API.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2014</copyright>
+    <tags>twitter c# api oauth</tags>
+  </metadata>
+</package>
