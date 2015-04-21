@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using TwitterOAuth.RestAPI.Models;
 using TwitterOAuth.RestAPI.Resources;
 
 namespace TwitterOAuth.RestAPI
@@ -11,6 +12,12 @@ namespace TwitterOAuth.RestAPI
         private Authorization Authorization { get; set; }
 
         private HttpClient HttpClient { get; set; }
+
+        public TwitterRestApiHttpClient(string apiKey, string apiSecret, string accessToken, string accessTokenSecret)
+            : this(new Authorization(new SecretModel() { ApiKey = apiKey, ApiSecret = apiSecret, AccessToken = accessToken, AccessTokenSecret = accessTokenSecret}))
+        {
+            // no-op
+        }
 
         public TwitterRestApiHttpClient(Authorization authorization)
             : this(authorization, new HttpClient())
