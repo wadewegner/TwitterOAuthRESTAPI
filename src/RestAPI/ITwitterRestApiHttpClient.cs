@@ -9,5 +9,7 @@ namespace TwitterOAuth.RestAPI
     public interface ITwitterRestApiHttpClient
     {
         Task<T> GetAsync<T>(string resourceUri, dynamic parameters);
+
+        Task<T> GetAsync<T>(string resourceUri);
     }
 }
