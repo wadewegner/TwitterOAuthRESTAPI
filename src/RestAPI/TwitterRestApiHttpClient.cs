@@ -14,7 +14,7 @@ namespace TwitterOAuth.RestAPI
         private HttpClient HttpClient { get; set; }
 
         public TwitterRestApiHttpClient(string apiKey, string apiSecret, string accessToken, string accessTokenSecret)
-            : this(new Authorization(new SecretModel() { ApiKey = apiKey, ApiSecret = apiSecret, AccessToken = accessToken, AccessTokenSecret = accessTokenSecret}))
+            : this(new Authorization(new SecretModel() { ApiKey = apiKey, ApiSecret = apiSecret, AccessToken = accessToken, AccessTokenSecret = accessTokenSecret }))
         {
             // no-op
         }
@@ -57,21 +57,20 @@ namespace TwitterOAuth.RestAPI
             var requestUri = new Uri(resourceUri);
 
             var signedHeader = this.Authorization.GetHeader(requestUri, HttpMethod.Get);
-            
-            this.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", signedHeader);
 
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = requestUri,
                 Method = HttpMethod.Get
             };
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("OAuth", signedHeader);
 
             var responseMessage = await this.HttpClient.SendAsync(requestMessage).ConfigureAwait(false);
             var responseContent = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             return new TwitterResponse() { HttpResponseMessage = responseMessage, Content = responseContent };
         }
-        
+
         private class TwitterResponse
         {
             public HttpResponseMessage HttpResponseMessage { get; set; }
