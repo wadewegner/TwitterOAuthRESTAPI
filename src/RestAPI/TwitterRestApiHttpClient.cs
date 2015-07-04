@@ -33,26 +33,32 @@ namespace TwitterOAuth.RestAPI
 
         public async Task<T> GetAsync<T>(string resourceUri, dynamic parameters)
         {
-            var queryString = UriHelper.ConvertDynamicToQueryStringParameters(parameters);
-
-            var resourceUriWithQueryString = string.Format("{0}?{1}", resourceUri, queryString);
+            var resourceUriWithQueryString = UriHelper.GetResourceUriWithQueryString(resourceUri, parameters);
 
             return await this.GetAsync<T>(resourceUriWithQueryString);
         }
 
         public async Task<T> GetAsync<T>(string resourceUri)
         {
-            var twitterResponse = await this.GetTwitterResponse(resourceUri);
+            var responseMessage = await this.GetHttpResponseMessageAsync(resourceUri);
+            var responseContent = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            if (twitterResponse.HttpResponseMessage.IsSuccessStatusCode)
+            if (responseMessage.IsSuccessStatusCode)
             {
-                return JsonHelper.ParseResponseContent<T>(twitterResponse.Content);
+                return JsonHelper.ParseResponseContent<T>(responseContent);
             }
 
-            throw new ApplicationException(string.Format("Received Non Success Status Code. {0} {1}", twitterResponse.HttpResponseMessage.StatusCode, twitterResponse.Content));
+            throw new ApplicationException(string.Format("Received Non Success Status Code. {0} {1}", responseMessage.StatusCode, responseContent));
         }
 
-        private async Task<TwitterResponse> GetTwitterResponse(string resourceUri)
+        public async Task<HttpResponseMessage> GetHttpResponseMessageAsync(string resourceUri, dynamic parameters)
+        {
+            var resourceUriWithQueryString = UriHelper.GetResourceUriWithQueryString(resourceUri, parameters);
+
+            return await this.GetHttpResponseMessageAsync(resourceUriWithQueryString);
+        }
+
+        public async Task<HttpResponseMessage> GetHttpResponseMessageAsync(string resourceUri)
         {
             var requestUri = new Uri(resourceUri);
 
@@ -65,16 +71,7 @@ namespace TwitterOAuth.RestAPI
             };
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("OAuth", signedHeader);
 
-            var responseMessage = await this.HttpClient.SendAsync(requestMessage).ConfigureAwait(false);
-            var responseContent = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            return new TwitterResponse() { HttpResponseMessage = responseMessage, Content = responseContent };
-        }
-
-        private class TwitterResponse
-        {
-            public HttpResponseMessage HttpResponseMessage { get; set; }
-            public string Content { get; set; }
+            return await this.HttpClient.SendAsync(requestMessage).ConfigureAwait(false);
         }
     }
 }

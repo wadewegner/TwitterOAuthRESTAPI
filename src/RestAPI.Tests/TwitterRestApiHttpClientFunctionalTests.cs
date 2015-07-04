@@ -70,6 +70,42 @@ namespace RestAPI.Tests
             Assert.IsNotNull(response.users);
         }
 
+        [Test]
+        public async Task GetHttpResponseMessage()
+        {
+            // arrange
+            dynamic parameters = new ExpandoObject();
+            parameters.screen_name = "twitter";
+
+            // sut
+            var client = new TwitterRestApiHttpClient(_authorization);
+
+            var responseMessage = await client.GetHttpResponseMessageAsync(Urls.FriendsList, parameters);
+
+            var responseContent = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            Assert.IsNotNull(responseMessage);
+            Assert.IsNotNull(responseContent);
+        }
+
+        [Test]
+        public async Task GetHttpResponseMessageError()
+        {
+            // arrange
+            dynamic parameters = new ExpandoObject();
+            parameters.screen_name = "!!!";
+
+            // sut
+            var client = new TwitterRestApiHttpClient(_authorization);
+
+            var responseMessage = await client.GetHttpResponseMessageAsync(Urls.FriendsList, parameters);
+
+            var responseContent = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            Assert.IsNotNull(responseMessage);
+            Assert.IsNotNull(responseContent);
+        }
+
         private class TwitterResponseFriendsList
         {
             public string previous_cursor { get; set; }

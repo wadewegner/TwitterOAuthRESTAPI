@@ -23,5 +23,15 @@ namespace TwitterOAuth.RestAPI.Resources
 
             return queryString;
         }
+
+        public static string GetResourceUriWithQueryString(string resourceUri, dynamic parameters)
+        {
+            var queryString = ConvertDynamicToQueryStringParameters(parameters);
+
+            var ub = new UriBuilder(resourceUri);
+            ub.Query = queryString;
+
+            return ub.Uri.AbsoluteUri;
+        }
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace TwitterOAuth.RestAPI
@@ -11,5 +8,9 @@ namespace TwitterOAuth.RestAPI
         Task<T> GetAsync<T>(string resourceUri, dynamic parameters);
 
         Task<T> GetAsync<T>(string resourceUri);
+
+        Task<HttpResponseMessage> GetHttpResponseMessageAsync(string resourceUri, dynamic parameters);
+
+        Task<HttpResponseMessage> GetHttpResponseMessageAsync(string resourceUri);
     }
 }
