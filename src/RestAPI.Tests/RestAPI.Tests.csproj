@@ -59,6 +59,7 @@
     <Compile Include="FunctionalTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TwitterRestApiHttpClientFunctionalTests.cs" />
+    <Compile Include="UriHelperTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RestAPI\RestAPI.csproj">

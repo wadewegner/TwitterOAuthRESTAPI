@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Routing;
 
 namespace TwitterOAuth.RestAPI.Resources
@@ -12,14 +9,19 @@ namespace TwitterOAuth.RestAPI.Resources
         public static string ConvertDynamicToQueryStringParameters(dynamic parameters)
         {
             var d = new RouteValueDictionary(parameters);
-            var sb = new StringBuilder();
 
-            foreach (var i in d)
-            {
-                sb.AppendFormat("{0}={1}&", i.Key, i.Value);
-            }
+            // TODO: support query string array value 
+            var queryString = string.Join("&",
+                from i in d
+                where
+                    !String.IsNullOrWhiteSpace(i.Key)
+                    && (i.Value != null && !String.IsNullOrWhiteSpace(i.Value.ToString()))
+                select
+                    Uri.EscapeDataString(i.Key)
+                    + "="
+                    + Uri.EscapeDataString(i.Value.ToString()));
 
-            return sb.ToString().TrimEnd('&');
+            return queryString;
         }
     }
 }
